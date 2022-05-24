@@ -1,5 +1,6 @@
 package helper;
 
+import Frame.BookTable;
 import Frame.Vars;
 import allClass.*;
 
@@ -23,9 +24,16 @@ public class Controller {
     }
 
     public void showBookTable() throws SQLException {
-        List<book> allBook =mySqlConnector.getAllBook();
-        Vars.bookTable.setTableData(allBook);
-        Vars.bookTable.setVisible(true);
+        if(BookTable.state ==0){
+            List<book> allBook =mySqlConnector.getAllBook();
+            Vars.bookTable.setTableData(allBook);
+            Vars.bookTable.setVisible(true);
+            BookTable.state =1;
+        }else {
+            resetBookTable();
+            Vars.bookTable.setVisible(true);
+        }
+
     }
 
 //    public void showChooseOperationFrame(){
@@ -59,5 +67,20 @@ public class Controller {
 
     public void someoneWantToBorrowOneBook(int id) throws SQLException {
         mySqlConnector.someoneBorrow(myBorrower.id,id);
+    }
+
+    public void resetBookTable() throws SQLException {
+        List<book> allBook =mySqlConnector.getAllBook();
+        Vars.bookTable.refreshTable(allBook);
+    }
+
+    public void showReturnFrame() throws SQLException {
+        List<BorrowInfo> allBorrowInfo =mySqlConnector.getALLBorrowInfo(myBorrower.name);
+        Vars.returnFrame.setBorrowInfoTable(allBorrowInfo);
+        Vars.returnFrame.setVisible(true);
+    }
+
+    public void someoneWantToReturnBook(String bookName) throws SQLException {
+        mySqlConnector.transcationReturnBook(bookName,myBorrower.id);
     }
 }

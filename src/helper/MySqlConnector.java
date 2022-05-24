@@ -1,5 +1,6 @@
 package helper;
 import allClass.*;
+import com.sun.corba.se.impl.resolver.SplitLocalResolverImpl;
 import com.sun.org.apache.bcel.internal.generic.RET;
 
 import java.sql.*;
@@ -17,6 +18,7 @@ public class MySqlConnector {
     Connection conn = null;
     Statement stmt = null;
     CallableStatement prepareCall = null;
+    PreparedStatement preparedStatement =null;
     //构造函数，先行连接数据库
     public MySqlConnector(){
         try{
@@ -179,5 +181,76 @@ public class MySqlConnector {
             se.printStackTrace();
         }
         return new borrower(id,score,userName);
+    }
+
+    public List<BorrowInfo> getALLBorrowInfo(String name) throws SQLException {
+        conn = DriverManager.getConnection(DB_URL,USER,PASS);
+        stmt = conn.createStatement();
+        String sql ="select * from check_borrow_info where borrower_name=";
+        sql =sql+"'"+name+"'";
+        System.out.println(sql);
+        ResultSet res = stmt.executeQuery(sql);
+        List<BorrowInfo> borrowInfos = new LinkedList<BorrowInfo>();
+        while(res.next()){
+            // 通过字段检索
+            String bookName =res.getString("book_name");
+            String borrowerName = res.getString("borrower_name");
+            String startTime= res.getString("start_time");
+            String endTime = res.getString("end_time");
+            borrowInfos.add(new BorrowInfo(bookName,borrowerName,startTime,endTime));
+        }
+        try{
+            if(stmt!=null) stmt.close();
+        }catch(SQLException se2){
+        }// 什么都不做
+        try{
+            if(conn!=null) conn.close();
+        }catch(SQLException se){
+            se.printStackTrace();
+        }
+        return borrowInfos;
+    }
+
+    public void transcationReturnBook(String bookName,int borrowerId) throws SQLException {
+        conn = DriverManager.getConnection(DB_URL,USER,PASS);
+        stmt = conn.createStatement();
+        // 先找到
+        String sql ="select book_id from book where book_name = ";
+        sql =sql +"'"+bookName+"'";
+        ResultSet res = stmt.executeQuery(sql);
+        int bookId=0;
+        while(res.next()){
+            // 通过字段检索
+            bookId  = res.getInt("book_id");
+        }
+
+
+        conn.setAutoCommit(false);//关闭自动提交开启事务
+        String sql1="delete from borrow_history where book_id = ";
+        sql1 = sql1+bookId+" and borrower_id =" +borrowerId;
+        String sql2="update book set num=num+1 where book_id =" + bookId;
+        preparedStatement = conn.prepareStatement(sql1);
+        preparedStatement.executeUpdate();
+        preparedStatement = conn.prepareStatement(sql2);
+        preparedStatement.executeUpdate();
+        conn.commit();
+
+        conn.setAutoCommit(true);
+        System.out.println(sql1);
+        System.out.println(sql2);
+        try{
+            if(stmt!=null) stmt.close();
+        }catch(SQLException se2){
+        }// 什么都不做
+        try{
+            if(preparedStatement!=null) preparedStatement.close();
+        }catch(SQLException se2){
+        }// 什么都不做
+        try{
+            if(conn!=null) conn.close();
+        }catch(SQLException se){
+            se.printStackTrace();
+        }
+
     }
 }

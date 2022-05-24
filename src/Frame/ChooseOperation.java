@@ -38,6 +38,16 @@ public class ChooseOperation extends JFrame {
                 }
             }
         });
+        returnButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Controller.getController().showReturnFrame();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
         setLayout(new GridLayout(1,4));
         add(borrowButton);
         add(returnButton);

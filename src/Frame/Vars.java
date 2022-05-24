@@ -8,5 +8,6 @@ public class Vars {
     public static ChooseOperation chooseOperation =new ChooseOperation();
     public static SeatTable seatTable = new SeatTable();
     public static SeatFrame seatFrame = new SeatFrame();
+    public static ReturnFrame returnFrame =new ReturnFrame();
 
 }

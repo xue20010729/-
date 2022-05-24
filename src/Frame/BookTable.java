@@ -18,6 +18,7 @@ public class BookTable extends JFrame{
 
     private JTable bookTable;
     private JButton borrowButton;
+    public static int state = 0;
     BookTable(){
 
     }
@@ -55,16 +56,26 @@ public class BookTable extends JFrame{
             public void actionPerformed(ActionEvent e) {
 //                System.out.println(num);
                 List<Integer> selectedBookId =new ArrayList<Integer>();
-                for (int i=0;i<bookTable.getRowCount();i++){
+                try {
+                    for (int i = 0; i < bookTable.getRowCount(); i++) {
 //                    System.out.println(bookTable.getValueAt(i,4));
-                    if((boolean)bookTable.getValueAt(i,4)){
-                        int id=(int) bookTable.getValueAt(i,0);
-                        try {
+                        if ((boolean) bookTable.getValueAt(i, 4)) {
+                            int id = (int) bookTable.getValueAt(i, 0);
                             Controller.getController().someoneWantToBorrowOneBook(id);
+                        }
+                    }
+                    new Thread(() -> {
+                        try {
+                            Controller.getController().resetBookTable();
+//                            bookTable.repaint();
                         } catch (SQLException ex) {
                             ex.printStackTrace();
                         }
-                    }
+                    }).start();
+
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null, "你已经借过这本书了！","错误提示框！", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
                 }
             }
         });
@@ -72,8 +83,16 @@ public class BookTable extends JFrame{
         contentPane.add(new JScrollPane(bookTable),BorderLayout.CENTER);
         contentPane.add(borrowButton,BorderLayout.SOUTH);
         setTitle("书籍总表");
-        setSize(600,200);
+        setSize(600,400);
         setVisible(true);
+    }
+
+    public void refreshTable(List<book> allBook){
+        DefaultTableModel model = (DefaultTableModel) bookTable.getModel();//获取defaulttablemodel
+        for(int i=0;i<allBook.size();i++){
+            model.setValueAt(allBook.get(i).getLeftNum(),i,2);
+            model.setValueAt(false,i,4);
+        }
     }
 
     public static void main(String[] args) {
