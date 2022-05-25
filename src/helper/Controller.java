@@ -1,7 +1,6 @@
 package helper;
 
-import Frame.BookTable;
-import Frame.Vars;
+import Frame.*;
 import allClass.*;
 
 
@@ -42,12 +41,19 @@ public class Controller {
 
     public void showLogInFrame(){
         Vars.logInFrame.setVisible(true);
+        Vars.welcomeFrame.setVisible(false);
     }
 
     public void showSeatTable() throws SQLException {
-        List<Seat> allSeat =mySqlConnector.getAllSeat();
-        Vars.seatTable.setSeatData(allSeat);
-        Vars.seatTable.setVisible(true);
+        if(SeatTable.state==0){
+            List<Seat> allSeat =mySqlConnector.getAllSeat();
+            Vars.seatTable.setSeatData(allSeat);
+            Vars.seatTable.setVisible(true);
+            SeatTable.state=1;
+        }else {
+            Vars.seatTable.setVisible(true);
+        }
+
     }
 
     public void userLogIn(String userName ,String password) throws SQLException {
@@ -75,12 +81,73 @@ public class Controller {
     }
 
     public void showReturnFrame() throws SQLException {
-        List<BorrowInfo> allBorrowInfo =mySqlConnector.getALLBorrowInfo(myBorrower.name);
-        Vars.returnFrame.setBorrowInfoTable(allBorrowInfo);
-        Vars.returnFrame.setVisible(true);
+        if(ReturnFrame.state==0){
+            List<BorrowInfo> allBorrowInfo =mySqlConnector.getALLBorrowInfo(myBorrower.name);
+            Vars.returnFrame.setBorrowInfoTable(allBorrowInfo);
+            Vars.returnFrame.setVisible(true);
+            ReturnFrame.state =1;
+        }else{
+            List<BorrowInfo> allBorrowInfo =mySqlConnector.getALLBorrowInfo(myBorrower.name);
+            Vars.returnFrame.resetTable(allBorrowInfo);
+            Vars.returnFrame.setVisible(true);
+        }
+
     }
 
     public void someoneWantToReturnBook(String bookName) throws SQLException {
         mySqlConnector.transcationReturnBook(bookName,myBorrower.id);
+    }
+
+    public void showOneSeatInfo(int seatId) throws SQLException {
+        List<MyTimePair> timeResevered =mySqlConnector.getReservedTime(seatId);
+        boolean[] isAvailebel =new boolean[24];
+        for(int i=0;i<24;i++){
+            isAvailebel[i]=true;
+        }
+        for(int i=0;i<timeResevered.size();i++){
+            for(int j=timeResevered.get(i).startTime;j<=timeResevered.get(i).endTime;j++){
+                isAvailebel[j] = false;
+            }
+        }
+        Vars.seatFrame.setSeatId(seatId);
+        Vars.seatFrame.setTimePanel(isAvailebel);
+        Vars.seatFrame.setVisible(true);
+
+    }
+
+
+    public void someoneReserveSeat(int seatId, int start, int end) throws SQLException {
+        mySqlConnector.someoneReserveSeat(myBorrower.id,seatId,start,end);
+    }
+
+    public void resetSeatFrame(int seatId) throws SQLException {
+        List<MyTimePair> timeResevered =mySqlConnector.getReservedTime(seatId);
+        boolean[] isAvailebel =new boolean[24];
+        for(int i=0;i<24;i++){
+            isAvailebel[i]=true;
+        }
+        for(int i=0;i<timeResevered.size();i++){
+            for(int j=timeResevered.get(i).startTime;j<=timeResevered.get(i).endTime;j++){
+                isAvailebel[j] = false;
+            }
+        }
+        Vars.seatFrame.setTimePanel(isAvailebel);
+    }
+
+    public void showReleaseFrame() throws SQLException {
+        if(RealeaseSeatFrame.state==0){
+            List<ReserveInfo> allReserveInfo =mySqlConnector.getALLReserveInfo(myBorrower.id);
+            Vars.realeaseSeatFrame.setReserveInfoTable(allReserveInfo);
+            Vars.realeaseSeatFrame.setVisible(true);
+            RealeaseSeatFrame.state=1;
+        }else{
+            List<ReserveInfo> allReserveInfo =mySqlConnector.getALLReserveInfo(myBorrower.id);
+            Vars.realeaseSeatFrame.resetTable(allReserveInfo);
+            Vars.realeaseSeatFrame.setVisible(true);
+        }
+    }
+
+    public void realeaseSeat(int seatId) throws SQLException {
+        mySqlConnector.realeaseSeat(myBorrower.id,seatId);
     }
 }

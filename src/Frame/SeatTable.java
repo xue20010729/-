@@ -1,18 +1,21 @@
 package Frame;
 
 import allClass.Seat;
+import helper.Controller;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SeatTable extends JFrame {
     private JTable seatTable;
     private JButton reseverButton;
+    public static int state =0;
     public SeatTable(){
 
     }
@@ -46,16 +49,22 @@ public class SeatTable extends JFrame {
         reseverButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                List<Integer> selectedBookId =new ArrayList<Integer>();
+                List<Integer> selectedSeatId =new ArrayList<Integer>();
                 for (int i=0;i<seatTable.getRowCount();i++){
                     if((boolean)seatTable.getValueAt(i,2)){
-                        selectedBookId.add(i);
+                        selectedSeatId.add((Integer) model.getValueAt(i,0));
                     }
                 }
-                if(selectedBookId.size() != 1) {
+                if(selectedSeatId.size() != 1) {
                     JOptionPane.showConfirmDialog(null, "选择的数量不符合规则", "ConfirmDialog", JOptionPane.DEFAULT_OPTION);
                 }else {
-                    System.out.println("准备查询");
+//                    System.out.println("准备查询");
+//                    System.out.println(selectedSeatId.get(0));
+                    try {
+                        Controller.getController().showOneSeatInfo(selectedSeatId.get(0));
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
         });

@@ -1,8 +1,8 @@
 package allClass;
 
 public class MyTimePair {
-    int startTime;
-    int endTime;
+    public int startTime;
+    public int endTime;
 
     public MyTimePair(int startTime, int endTime) {
         this.startTime = startTime;

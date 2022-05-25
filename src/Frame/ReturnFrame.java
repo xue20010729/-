@@ -15,7 +15,7 @@ import java.util.List;
 public class ReturnFrame extends JFrame {
     private JTable borrowInfoTable;
     private JButton returnButton;
-
+    public static int state =0;
     ReturnFrame(){
 
     }
@@ -86,6 +86,24 @@ public class ReturnFrame extends JFrame {
         DefaultTableModel model = (DefaultTableModel) borrowInfoTable.getModel();//获取defaulttablemodel
         for (Integer selectedRow : selectedRows) {
             model.removeRow(selectedRow);
+        }
+    }
+
+    public void resetTable(List<BorrowInfo> allBorrowInfo){
+        DefaultTableModel model = (DefaultTableModel) borrowInfoTable.getModel();
+        for(int i=0;i<borrowInfoTable.getRowCount();i++){
+            model.removeRow(i);
+        }
+        Object[][] borrowInfo = new Object[allBorrowInfo.size()][5];
+        for(int i=0;i<allBorrowInfo.size();i++){
+            borrowInfo[i][0]=allBorrowInfo.get(i).getBookName();
+            borrowInfo[i][1]=allBorrowInfo.get(i).getBorrowName();
+            borrowInfo[i][2]=allBorrowInfo.get(i).getStartTime();
+            borrowInfo[i][3]=allBorrowInfo.get(i).getEndTime();
+            borrowInfo[i][4]=false;
+        }
+        for (int i=0;i<allBorrowInfo.size();i++){
+            model.addRow(borrowInfo[i]);
         }
     }
 

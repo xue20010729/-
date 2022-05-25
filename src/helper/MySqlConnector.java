@@ -1,7 +1,5 @@
 package helper;
 import allClass.*;
-import com.sun.corba.se.impl.resolver.SplitLocalResolverImpl;
-import com.sun.org.apache.bcel.internal.generic.RET;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -236,8 +234,8 @@ public class MySqlConnector {
         conn.commit();
 
         conn.setAutoCommit(true);
-        System.out.println(sql1);
-        System.out.println(sql2);
+//        System.out.println(sql1);
+//        System.out.println(sql2);
         try{
             if(stmt!=null) stmt.close();
         }catch(SQLException se2){
@@ -252,5 +250,105 @@ public class MySqlConnector {
             se.printStackTrace();
         }
 
+    }
+
+    public List<MyTimePair> getReservedTime(int seatId) throws SQLException {
+        conn = DriverManager.getConnection(DB_URL,USER,PASS);
+        stmt = conn.createStatement();
+        String sql ="select start_time,end_time from reserve_history where seat_id =" +seatId;
+        ResultSet res = stmt.executeQuery(sql);
+        List<MyTimePair> timeReseverd = new LinkedList<MyTimePair>();
+        while(res.next()){
+            // 通过字段检索
+            int startTime  = res.getInt("start_time");
+            int endTime = res.getInt("end_time");
+            timeReseverd.add(new MyTimePair(startTime,endTime));
+        }
+        try{
+            if(stmt!=null) stmt.close();
+        }catch(SQLException se2){
+        }// 什么都不做
+        try{
+            if(conn!=null) conn.close();
+        }catch(SQLException se){
+            se.printStackTrace();
+        }
+        return timeReseverd;
+    }
+
+    public void someoneReserveSeat(int borrowerId, int seatId, int start, int end) throws SQLException {
+        conn = DriverManager.getConnection(DB_URL,USER,PASS);
+        prepareCall =conn.prepareCall("{call reserve_seat(?,?,?,?)}");
+        prepareCall.setInt(1,borrowerId);
+        prepareCall.setInt(2,seatId);
+        prepareCall.setInt(3,start);
+        prepareCall.setInt(4,end);
+        prepareCall.execute();
+        try{
+            if(prepareCall!=null) prepareCall.close();
+        }catch(SQLException se2){
+        }// 什么都不做
+        try{
+            if(conn!=null) conn.close();
+        }catch(SQLException se){
+            se.printStackTrace();
+        }
+    }
+
+    public List<ReserveInfo> getALLReserveInfo(int BorrowerId) throws SQLException {
+        conn = DriverManager.getConnection(DB_URL,USER,PASS);
+        stmt = conn.createStatement();
+        String sql ="select * from reserve_history where borrower_id=";
+        sql =sql+BorrowerId;
+        System.out.println(sql);
+        ResultSet res = stmt.executeQuery(sql);
+        List<ReserveInfo> reserveInfos = new LinkedList<ReserveInfo>();
+        while(res.next()){
+            // 通过字段检索
+            int borrowerId =res.getInt(1);
+            int seatId = res.getInt(2);
+            int start = res.getInt(3);
+            int end = res.getInt(4);
+            String date = res.getString(5);
+            reserveInfos.add(new ReserveInfo(borrowerId,seatId,start,end,date));
+        }
+        try{
+            if(stmt!=null) stmt.close();
+        }catch(SQLException se2){
+        }// 什么都不做
+        try{
+            if(conn!=null) conn.close();
+        }catch(SQLException se){
+            se.printStackTrace();
+        }
+        return reserveInfos;
+    }
+
+    public void realeaseSeat(int borrowerId, int seatId) throws SQLException {
+        conn = DriverManager.getConnection(DB_URL,USER,PASS);
+        stmt = conn.createStatement();
+        conn.setAutoCommit(false);//关闭自动提交开启事务
+        String sql1="delete from reserve_history where borrower_id= ";
+        sql1 = sql1+borrowerId+" and seat_id=" +seatId;
+        preparedStatement = conn.prepareStatement(sql1);
+        preparedStatement.executeUpdate();
+        conn.commit();
+
+        conn.setAutoCommit(true);
+//        System.out.println(sql1);
+//        System.out.println(sql2);
+        try{
+            if(stmt!=null) stmt.close();
+        }catch(SQLException se2){
+        }// 什么都不做
+        try{
+            if(preparedStatement!=null) preparedStatement.close();
+        }catch(SQLException se2){
+        }// 什么都不做
+        try{
+            if(conn!=null) conn.close();
+        }catch(SQLException se){
+            se.printStackTrace();
+        }
     }
 }

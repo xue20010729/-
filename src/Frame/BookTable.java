@@ -74,7 +74,12 @@ public class BookTable extends JFrame{
                     }).start();
 
                 } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "你已经借过这本书了！","错误提示框！", JOptionPane.ERROR_MESSAGE);
+                    if(ex.getMessage().equals("no book left")){
+                        JOptionPane.showMessageDialog(null, "本书没有剩余！！","错误提示框！", JOptionPane.ERROR_MESSAGE);
+                    }else{
+                        JOptionPane.showMessageDialog(null, "你已经借过这本书了！","错误提示框！", JOptionPane.ERROR_MESSAGE);
+                    }
+
                     ex.printStackTrace();
                 }
             }
