@@ -14,11 +14,17 @@ public class WelcomeFrame extends JFrame{
 //    private JButton onlineButton;
     WelcomeFrame(){
         logInButton =new JButton("Log In");
-        administratorLogInButton =new JButton("administrator");
+        administratorLogInButton =new JButton("Demo");
         logInButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Controller.getController().showLogInFrame();
+            }
+        });
+        administratorLogInButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Controller.getController().showForDemoFrame();
             }
         });
         setLayout(new GridLayout(3,1));

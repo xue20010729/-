@@ -3,6 +3,7 @@ package Frame;
 
 public class Vars {
     public static WelcomeFrame welcomeFrame = new WelcomeFrame();
+    public static AdminFrame adminFrame=new AdminFrame();
     public static LogInFrame logInFrame= new LogInFrame();
     public static BookTable bookTable =new BookTable();
     public static ChooseOperation chooseOperation =new ChooseOperation();
@@ -10,4 +11,5 @@ public class Vars {
     public static SeatFrame seatFrame = new SeatFrame(0);
     public static ReturnFrame returnFrame =new ReturnFrame();
     public static RealeaseSeatFrame realeaseSeatFrame=new RealeaseSeatFrame();
+    public static ForDemoFrame forDemoFrame=new ForDemoFrame();
 }

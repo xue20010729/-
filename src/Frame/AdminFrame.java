@@ -3,6 +3,7 @@ package Frame;
 import allClass.book;
 import com.sun.org.apache.xpath.internal.objects.XObject;
 import helper.Controller;
+import org.w3c.dom.html.HTMLButtonElement;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,17 +15,45 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookTable extends JFrame{
+public class AdminFrame extends JFrame{
 
+    class InputFrame extends JFrame{
+        JTextField newIdField;
+        JButton alterButton;
+        int oldId;
+        InputFrame(){
+            newIdField=new JTextField();
+            alterButton=new JButton("修改");
+            alterButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String str=newIdField.getText();
+                    int newId=Integer.parseInt(str);
+                    System.out.println(newId);
+                }
+            });
+            Container contentPane=getContentPane();
+            contentPane.setLayout(new GridLayout(2,1));
+            contentPane.add(newIdField);
+            contentPane.add(alterButton);
+            setTitle("更改表");
+            setSize(400,300);
+        }
+        public void setOldId(int oldId){
+            this.oldId=oldId;
+        }
+    }
     private JTable bookTable;
     private JButton borrowButton;
+    InputFrame inputFrame;
     public static int state = 0;
-    BookTable(){
+    AdminFrame(){
 
     }
 
     public void setTableData(List<book> allBook){
 //        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        inputFrame=new InputFrame();
         Container contentPane=getContentPane();
         String[] name = {"书籍编号","书籍名称","可借数量","楼层","选择"};
         Object[][] bookInfo = new Object[allBook.size()][5];
@@ -50,40 +79,24 @@ public class BookTable extends JFrame{
             }
         };
 
-        borrowButton=new JButton("借阅");
+        borrowButton=new JButton("修改");
         borrowButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 //                System.out.println(num);
                 List<Integer> selectedBookId =new ArrayList<Integer>();
-                try {
-                    for (int i = 0; i < bookTable.getRowCount(); i++) {
+                for (int i = 0; i < bookTable.getRowCount(); i++) {
 //                    System.out.println(bookTable.getValueAt(i,4));
-                        if ((boolean) bookTable.getValueAt(i, 4)) {
-                            int id = (int) bookTable.getValueAt(i, 0);
-                            selectedBookId.add(id);
-                            Controller.getController().someoneWantToBorrowOneBook(id);
-                        }
+                    if ((boolean) bookTable.getValueAt(i, 4)) {
+                        int id = (int) bookTable.getValueAt(i, 0);
+                        selectedBookId.add(id);
                     }
-                    new Thread(() -> {
-                        try {
-                            Controller.getController().resetBookTable();
-//                            bookTable.repaint();
-                        } catch (SQLException ex) {
-                            ex.printStackTrace();
-                        }
-                    }).start();
-                    if(selectedBookId.size()>0){
-                        JOptionPane.showMessageDialog(null, "借阅成功","消息提示框！", JOptionPane.PLAIN_MESSAGE);
-                    }
-                } catch (SQLException ex) {
-                    if(ex.getMessage().equals("no book left")){
-                        JOptionPane.showMessageDialog(null, "本书没有剩余！！","错误提示框！", JOptionPane.ERROR_MESSAGE);
-                    }else{
-                        JOptionPane.showMessageDialog(null, "你已经借过这本书了！","错误提示框！", JOptionPane.ERROR_MESSAGE);
-                    }
-
-                    ex.printStackTrace();
+                }
+                if(selectedBookId.size()!=1) {
+                    JOptionPane.showConfirmDialog(null, "选择的数量不符合规则", "ConfirmDialog", JOptionPane.DEFAULT_OPTION);
+                }else {
+                    inputFrame.setOldId(selectedBookId.get(0));
+                    inputFrame.setVisible(true);
                 }
             }
         });
@@ -108,3 +121,4 @@ public class BookTable extends JFrame{
 //        BookTable test =new BookTable();
     }
 }
+

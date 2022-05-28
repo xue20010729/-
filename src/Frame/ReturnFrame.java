@@ -63,21 +63,23 @@ public class ReturnFrame extends JFrame {
                         } catch (SQLException ex) {
                             ex.printStackTrace();
                         }
-//                        System.out.println(bookName);
-//                        System.out.println(borrowerName);
+
                     }
                 }
+
                 new Thread(() -> {
                     refreshTable(selectedBorrowInfo);
                 }).start();
-
+                if(selectedBorrowInfo.size()>0){
+                    JOptionPane.showMessageDialog(null, "归还成功","消息提示框！", JOptionPane.PLAIN_MESSAGE);
+                }
 
             }
         });
         contentPane.setLayout(new BorderLayout());
         contentPane.add(new JScrollPane(borrowInfoTable),BorderLayout.CENTER);
         contentPane.add(returnButton,BorderLayout.SOUTH);
-        setTitle("书籍总表");
+        setTitle("借阅记录");
         setSize(600,400);
         setVisible(true);
     }

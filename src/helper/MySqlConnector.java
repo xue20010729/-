@@ -8,7 +8,7 @@ import java.util.List;
 public class MySqlConnector {
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 //    static final String DB_URL = "jdbc:mysql://localhost:3306/database_finalwork?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    static final String DB_URL = "jdbc:mysql://192.168.11.128:3306/database_final?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    static final String DB_URL = "jdbc:mysql://192.168.11.132:3306/database_final?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
 
     static final String USER = "root";
     static final String PASS = "223502xuechen";
@@ -119,7 +119,7 @@ public class MySqlConnector {
 
     }
 
-    public boolean userLogIn(String userName ,String password) throws SQLException {
+    public int userLogIn(String userName ,String password) throws SQLException {
         conn = DriverManager.getConnection(DB_URL,USER,PASS);
         stmt = conn.createStatement();
         // 查找是否有这个人
@@ -132,6 +132,33 @@ public class MySqlConnector {
         while(res.next()){
             num= res.getInt(1);
         }
+
+        int id =0;
+        if(num==1){
+            String sqlToId="select id from borrower where name =";
+            sqlToId=sqlToId+"'"+userName+"'";
+            res = stmt.executeQuery(sqlToId);
+            while(res.next()){
+                id= res.getInt(1);
+            }
+            String sql1 ="select count(*) from student where id="+id;
+            String sql2 ="select count(*) from teacher where id="+id;
+            res = stmt.executeQuery(sql1);
+            while(res.next()){
+                if( res.getInt(1)==1){
+                    num =2;
+                }
+//                System.out.println(res.getInt(1));
+            }
+            res = stmt.executeQuery(sql2);
+            while(res.next()){
+                if( res.getInt(1)==1){
+                    num =3;
+                }
+//                System.out.println(res.getInt(1));
+            }
+
+        }
         try{
             if(stmt!=null) stmt.close();
         }catch(SQLException se2){
@@ -141,7 +168,7 @@ public class MySqlConnector {
         }catch(SQLException se){
             se.printStackTrace();
         }
-        return num > 0;
+        return num ;
     }
     public static void main(String[] args) {
 //        try {
@@ -157,7 +184,7 @@ public class MySqlConnector {
     public borrower getBorrowerInfo(String userName) throws SQLException {
         conn = DriverManager.getConnection(DB_URL,USER,PASS);
         stmt = conn.createStatement();
-        // 查找是否有这个人
+
         String sql ="select id,score from borrower where name=";
         sql = sql+"'"+userName+"'" ;
 //        System.out.println(sql);
@@ -168,6 +195,25 @@ public class MySqlConnector {
         while(res.next()){
             id= res.getInt("id");
             score =res.getInt("score");
+        }
+
+        int number=0;
+        String str;
+
+        String sql1="select student_number,college from student where id="+id;
+        String sql2="select job_number,position from teacher where id="+id;
+        res = stmt.executeQuery(sql1);
+        while(res.next()){
+            number= res.getInt(1);
+            str =res.getString(2);
+            return new student(id,score,userName,number,str);
+        }
+
+        res = stmt.executeQuery(sql2);
+        while(res.next()){
+            number= res.getInt(1);
+            str =res.getString(2);
+            return new teacher(id,score,userName,number,str);
         }
         try{
             if(stmt!=null) stmt.close();

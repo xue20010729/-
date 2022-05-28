@@ -71,6 +71,7 @@ public class SeatFrame extends JFrame {
                                     ex.printStackTrace();
                                 }
                             }).start();
+                            JOptionPane.showMessageDialog(null, "预定成功","消息提示框！", JOptionPane.PLAIN_MESSAGE);
                         } catch (SQLException ex) {
                             if(ex.getMessage().equals("you have reserve this seat")){
                                 JOptionPane.showMessageDialog(null, "你已经预定过这个座位了","错误提示框！", JOptionPane.ERROR_MESSAGE);

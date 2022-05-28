@@ -57,11 +57,31 @@ public class Controller {
     }
 
     public void userLogIn(String userName ,String password) throws SQLException {
-        boolean success=mySqlConnector.userLogIn(userName,password);
-        if (success){
+        int success=mySqlConnector.userLogIn(userName,password);
+        if (success>0){
             Vars.chooseOperation.setVisible(true);
             Vars.logInFrame.setVisible(false);
             myBorrower = mySqlConnector.getBorrowerInfo(userName);
+//            System.out.println(success);\
+            new Thread(()->{
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if(success==2){
+                    JOptionPane.showConfirmDialog(null, "欢迎回来,"+myBorrower.name+ "同学", "messageBox", JOptionPane.DEFAULT_OPTION);
+                }else if(success==3){
+                    JOptionPane.showConfirmDialog(null, "欢迎回来,"+myBorrower.name+ "老师", "messageBox", JOptionPane.DEFAULT_OPTION);
+                }
+                if(myBorrower instanceof student){
+                    System.out.println("同学");
+                }
+                if(myBorrower instanceof teacher){
+                    System.out.println("老师");
+                }
+            }).start();
+
         }else{
             JOptionPane.showConfirmDialog(null, "账户不存在", "ConfirmDialog", JOptionPane.DEFAULT_OPTION);
         }
@@ -149,5 +169,26 @@ public class Controller {
 
     public void realeaseSeat(int seatId) throws SQLException {
         mySqlConnector.realeaseSeat(myBorrower.id,seatId);
+    }
+
+    public void showAdminFrame() throws SQLException {
+        if(AdminFrame.state ==0){
+            List<book> allBook =mySqlConnector.getAllBook();
+            Vars.adminFrame.setTableData(allBook);
+            Vars.adminFrame.setVisible(true);
+            BookTable.state =1;
+        }else {
+            List<book> allBook =mySqlConnector.getAllBook();
+            Vars.adminFrame.refreshTable(allBook);
+            Vars.adminFrame.setVisible(true);
+        }
+    }
+
+    public void showForDemoFrame() {
+        Vars.forDemoFrame.setVisible(true);
+    }
+
+    public void borrowBookForDemo(int borrowerId, int bookId) throws SQLException {
+        mySqlConnector.someoneBorrow(borrowerId,bookId);
     }
 }

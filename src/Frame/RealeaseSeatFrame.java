@@ -77,7 +77,9 @@ public class RealeaseSeatFrame extends JFrame {
                 new Thread(() -> {
                     refreshTable(selectedReserverInfo);
                 }).start();
-
+                if(selectedReserverInfo.size()>0){
+                    JOptionPane.showMessageDialog(null, "释放成功","消息提示框！", JOptionPane.PLAIN_MESSAGE);
+                }
 
             }
         });

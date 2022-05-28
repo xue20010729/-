@@ -71,7 +71,7 @@ public class SeatTable extends JFrame {
         contentPane.setLayout(new BorderLayout());
         contentPane.add(new JScrollPane(seatTable),BorderLayout.CENTER);
         contentPane.add(reseverButton,BorderLayout.SOUTH);
-        setTitle("书籍总表");
+        setTitle("座位总表");
         setSize(600,200);
         setVisible(true);
     }
